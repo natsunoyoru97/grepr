@@ -1,6 +1,9 @@
 # rgrep
 A demo with much more limited ability than grep. It's also one of my rust coding practices.
 
+Effect:
+![testcase1](./testcase1.png)
+
 ## TODOs
 - **Support regex to find all files that matches**
 - **Reconstruct the code**, try to implement ``impl`` and Trait rather than lots of ``fn`` s
