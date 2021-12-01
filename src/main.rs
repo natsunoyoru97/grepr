@@ -1,13 +1,12 @@
 use clap::{Parser};
 use colored::*;
-use tokio::fs;
 use regex::Regex;
 
 #[derive(Parser)]
 #[clap(version = "1.0", author = "natsunoyoru97 <natsunoyoru97@outlook.com>")]
 struct Opts {
-    regex: Regex,
-    src_file: String,
+    word_regex: Regex,
+    file_regex: String, 
 }
 
 struct Line<'a> {
@@ -19,16 +18,26 @@ struct Line<'a> {
 
 /// Open the src_file to fetch its content
 #[tokio::main]
-async fn read_file<'a>(src_str: Regex, file_name: &'a str) -> Result<(), Box<dyn std::error::Error + 'static>> {
-    let content = fs::read_to_string(file_name).await?;
-    match_word(src_str, content.as_str());
+async fn read_file<'a>(src_str: &Regex, file_name: String) -> Result<(), Box<dyn std::error::Error + 'static>> {
+    let files: Vec<_> = glob::glob(file_name.as_str())?.collect();
+
+    for file in files {
+        match file {
+            Ok(path) => {
+                let path_str = path.display().to_string();
+                let content = tokio::fs::read_to_string(path.display().to_string()).await?;
+                match_word(src_str, &path_str, content.as_str());
+            },
+            Err(e) => println!("{:?}", e),
+        }
+        
+    }
 
     Ok(())
 }
 
 /// Find the lines that match
-/// TODO: Highlight the src_str
-fn match_word<'a>(regex: Regex, content: &'a str) {
+fn match_word<'a>(regex: &Regex, path: &String, content: &'a str) {
     let lines = content
                 .split("\n")
                 .collect::<Vec<&str>>();
@@ -52,11 +61,12 @@ fn match_word<'a>(regex: Regex, content: &'a str) {
                                         .replace(word, &format!("{}", word.to_string().red()));
                 new_line.line_content = new_line_content;
             }
-
             res.push(new_line);
         }
     }
-
+    if res.len() > 0 {
+        println!("{}", path.purple());
+    }
     highlight_match(&res);
     print_res(&res);
 
@@ -80,7 +90,7 @@ fn main() {
     let opts: Opts = Opts::parse();
 
     // Read file
-    let result = read_file(opts.regex, opts.src_file.as_str());
+    let result = read_file(&opts.word_regex, opts.file_regex);
     match result {
         Ok(result) => result,
         // TODO: Pretty print the error message

@@ -2,7 +2,7 @@
 A demo with much more limited ability than grep. It's also one of my rust coding practices.
 
 Effect:
-![testcase1](./testcase1.png)
+![testcase1](./testcase2.png)
 
 ## TODOs
 - **Support regex to find all files that matches**
@@ -10,6 +10,8 @@ Effect:
 - Add these functions, and maybe some more:
     - Match multiple regexs
     - You can use use your own .conf to customize the content of the args
+    - Async I/Os
+    - Enable the file path as the arg
 - Add more test cases
 - Add benchmarks
 
