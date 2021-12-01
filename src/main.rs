@@ -1,4 +1,4 @@
-use clap::{Parser};
+use clap::Parser;
 use colored::*;
 use regex::Regex;
 
@@ -18,14 +18,14 @@ struct Line<'a> {
 
 /// Open the src_file to fetch its content
 #[tokio::main]
-async fn read_file<'a>(src_str: &Regex, file_name: String) -> Result<(), Box<dyn std::error::Error + 'static>> {
-    let files: Vec<_> = glob::glob(file_name.as_str())?.collect();
+async fn read_file<'a>(src_str: &Regex, file_regex: String) -> Result<(), Box<dyn std::error::Error + 'static>> {
+    let files: Vec<_> = glob::glob(file_regex.as_str())?.collect();
 
     for file in files {
         match file {
             Ok(path) => {
                 let path_str = path.display().to_string();
-                let content = tokio::fs::read_to_string(path.display().to_string()).await?;
+                let content = tokio::fs::read_to_string(path).await?;
                 match_word(src_str, &path_str, content.as_str());
             },
             Err(e) => println!("{:?}", e),
@@ -42,6 +42,7 @@ fn match_word<'a>(regex: &Regex, path: &String, content: &'a str) {
                 .split("\n")
                 .collect::<Vec<&str>>();
     let mut res: Vec<Line> = Vec::new();
+
     for (i, line) in lines.iter().enumerate() {
         if regex.is_match(line) {
             let mut new_line = Line {
@@ -53,29 +54,30 @@ fn match_word<'a>(regex: &Regex, path: &String, content: &'a str) {
                         .collect(), 
                 line_content: line.to_string(),
             };
-
-            // Highlight the matched words
-            // TODO: Move the code snippet, making them a single function
-            for word in new_line.matches.clone() {
-                let new_line_content = new_line.line_content
-                                        .replace(word, &format!("{}", word.to_string().red()));
-                new_line.line_content = new_line_content;
-            }
+            
+            render_matched_content(&mut new_line);
             res.push(new_line);
         }
     }
-    if res.len() > 0 {
+
+    if !res.is_empty() {
         println!("{}", path.purple());
     }
-    highlight_match(&res);
+    
     print_res(&res);
 
 }
 
-fn highlight_match(fetched_line: &Vec<Line>) {
-    // TODO: The function to fill
+/// Render the matched String to a certain color
+fn render_matched_content(line: &mut Line) {
+    for word in line.matches.clone() {
+        let new_line_content = line.line_content
+                                .replace(word, &format!("{}", word.to_string().red()));
+        line.line_content = new_line_content;
+    }
 }
 
+/// Print fetched lines
 fn print_res(fetched_lines: &Vec<Line>) {
     for line in fetched_lines {
         println!("{}:{} {}",
