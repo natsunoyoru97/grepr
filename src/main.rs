@@ -61,7 +61,7 @@ fn match_word<'a>(regex: &Regex, path: &String, content: &'a str) {
     }
 
     if !res.is_empty() {
-        println!("{}", path.purple());
+        println!("- {0}", path.purple());
     }
     
     print_res(&res);
@@ -80,12 +80,13 @@ fn render_matched_content(line: &mut Line) {
 /// Print fetched lines
 fn print_res(fetched_lines: &Vec<Line>) {
     for line in fetched_lines {
-        println!("{}:{} {}",
+        println!("  {0}:{1} {2}",
                 line.row_num.to_string().blue(),
                 line.col_num.to_string().green(),
                 line.line_content
         );
     }
+    println!("");
 }
 
 fn main() {
