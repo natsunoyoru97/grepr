@@ -80,7 +80,7 @@ fn render_matched_content(line: &mut Line) {
 /// Print fetched lines
 fn print_res(fetched_lines: &Vec<Line>) {
     for line in fetched_lines {
-        println!("  {0}:{1} {2}",
+        println!("  {0}:{1}     {2}",
                 line.row_num.to_string().blue(),
                 line.col_num.to_string().green(),
                 line.line_content

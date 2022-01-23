@@ -2,7 +2,7 @@
 A demo with much more limited ability than grep. It's also one of my rust coding practices.
 
 Effect:
-![testcase1](./testcase2.png)
+![testcase1](./example_output.png)
 
 ## TODOs
 - **Support regex to find all files that matches**
