@@ -5,7 +5,7 @@ Effect:
 ![testcase1](./example_output.png)
 
 ## TODOs
-- **Support regex to find all files that matches**
+- Capture **the output of process piped**, like``ps aux | rgrep <keyword>``
 - **Reconstruct the code**, try to implement ``impl`` and Trait rather than lots of ``fn`` s
 - Add these functions, and maybe some more:
     - Match multiple regexs
