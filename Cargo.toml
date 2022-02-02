@@ -1,6 +1,8 @@
 [package]
 name = "rgrep"
-version = "0.1.0"
+version = "0.2.0"
+authors = ["natsunoyoru97 <natsunoyoru97@outlook.com>"]
+description = "A simple grep printing in a pretty format"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

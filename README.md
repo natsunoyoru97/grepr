@@ -4,8 +4,12 @@ A demo with much more limited ability than grep. It's also one of my rust coding
 Effect:
 ![testcase1](./example_output.png)
 
+## Features:
+- Showing the line and the position of the matched words
+- Can capture the output of the pipe, like``ps aux | rgrep <keyword>``
+
 ## TODOs
-- Capture **the output of process piped**, like``ps aux | rgrep <keyword>``
+- Enable range search of the file(s)
 - **Reconstruct the code**, try to implement ``impl`` and Trait rather than lots of ``fn`` s
 - Add these functions, and maybe some more:
     - Match multiple regexs

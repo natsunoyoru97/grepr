@@ -1,12 +1,38 @@
-use clap::Parser;
+#![deny(missing_docs)]
+//! A simple grep printing in a pretty format.
+
+use clap::{ArgMatches, Parser};
 use colored::*;
 use regex::Regex;
+use std::{io, env};
 
 #[derive(Parser)]
-#[clap(version = "1.0", author = "natsunoyoru97 <natsunoyoru97@outlook.com>")]
+#[clap(
+    version = env!("CARGO_PKG_VERSION"),
+    author = env!("CARGO_PKG_AUTHORS"),
+    about = env!("CARGO_PKG_DESCRIPTION")
+)]
 struct Opts {
     word_regex: Regex,
-    file_regex: String, 
+    file_regex: Option<String>, 
+}
+
+impl From<ArgMatches> for Opts {
+    fn from(m: ArgMatches) -> Self {
+        let file_regex = m.value_of("file_regex").unwrap();
+        match file_regex.is_empty() {
+            true => Opts {
+                word_regex: Regex::new(m.value_of("word_regex").unwrap())
+                    .expect("Parse error"),
+                file_regex: None,
+            },
+            false => Opts {
+                word_regex: Regex::new(m.value_of("word_regex").unwrap())
+                    .expect("Parse Error"),
+                file_regex: Some(file_regex.to_owned()),
+            }
+        }
+    }
 }
 
 struct Line<'a> {
@@ -37,7 +63,7 @@ async fn read_file<'a>(src_str: &Regex, file_regex: String) -> Result<(), Box<dy
 }
 
 /// Find the lines that match
-fn match_word<'a>(regex: &Regex, path: &String, content: &'a str) {
+fn match_word<'a>(regex: &Regex, path: &str, content: &'a str) {
     let lines = content
                 .split("\n")
                 .collect::<Vec<&str>>();
@@ -60,12 +86,13 @@ fn match_word<'a>(regex: &Regex, path: &String, content: &'a str) {
         }
     }
 
-    if !res.is_empty() {
+    if !res.is_empty() && !path.is_empty() {
         println!("- {0}", path.purple());
     }
     
-    print_res(&res);
-
+    if !res.is_empty() {
+        print_res(&res);
+    }
 }
 
 /// Render the matched String to a certain color
@@ -90,13 +117,34 @@ fn print_res(fetched_lines: &Vec<Line>) {
 }
 
 fn main() {
-    let opts: Opts = Opts::parse();
+        let opts: Opts = Opts::parse();
 
-    // Read file
-    let result = read_file(&opts.word_regex, opts.file_regex);
-    match result {
-        Ok(result) => result,
-        // TODO: Pretty print the error message
-        Err(error) => panic!("Cannot read file: {}", error),
-    }
+        match opts.file_regex {
+            // Read file contents
+            Some(file) => {
+                let result = read_file(&opts.word_regex, file);
+                match result {
+                    Ok(result) => result,
+                    // TODO: Pretty print the error message
+                    Err(error) => panic!("Cannot read file: {}", error),
+                }
+            },
+            // Read pipe contents
+            None => {
+                println!("Now starting reading from pipe...");
+
+                loop {
+                    let mut input = String::new();
+                    io::stdin()
+                        .read_line(&mut input)
+                        .expect("failed to read from pipe");
+                    input = input.trim().to_owned();
+                    if input.is_empty() {
+                        break;
+                    }
+                    match_word(&opts.word_regex, &"", input.as_str());
+                }
+            },
+        }
+        
 }
