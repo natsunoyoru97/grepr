@@ -131,8 +131,6 @@ fn main() {
             },
             // Read pipe contents
             None => {
-                println!("Now starting reading from pipe...");
-
                 loop {
                     let mut input = String::new();
                     io::stdin()

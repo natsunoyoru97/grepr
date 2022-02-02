@@ -2,7 +2,11 @@
 A demo with much more limited ability than grep. It's also one of my rust coding practices.
 
 Effect:
-![testcase1](./example_output.png)
+- File:
+![testcase1](./example_output_file.png)
+
+- Pipe:
+![testcase2](./example_output_pipe.png)
 
 ## Features:
 - Showing the line and the position of the matched words
