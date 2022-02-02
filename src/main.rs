@@ -4,7 +4,9 @@
 use clap::{ArgMatches, Parser};
 use colored::*;
 use regex::Regex;
-use std::{io, env};
+use std::{env};
+use std::io;
+use std::io::{BufRead, BufReader};
 
 #[derive(Parser)]
 #[clap(
@@ -131,17 +133,17 @@ fn main() {
             },
             // Read pipe contents
             None => {
-                loop {
-                    let mut input = String::new();
-                    io::stdin()
-                        .read_line(&mut input)
-                        .expect("failed to read from pipe");
-                    input = input.trim().to_owned();
-                    if input.is_empty() {
-                        break;
-                    }
-                    match_word(&opts.word_regex, &"", input.as_str());
-                }
+                // TODO: Enable async reading?
+                let mut buf = vec![];
+                let stdin = io::stdin();
+                let mut reader = BufReader::new(stdin);
+                reader.read_until(u8::MIN, &mut buf)
+                    .unwrap();
+                    
+                match_word(&opts.word_regex, &""
+                , String::from_utf8(buf)
+                    .unwrap()
+                    .as_str());
             },
         }
         
